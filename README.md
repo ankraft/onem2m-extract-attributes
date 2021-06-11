@@ -76,7 +76,7 @@ See the [CHANGELOG.md][changelog] file.
 
 
 ## License
-This project is licensed under the terms of the [BSD 3-Clause License][bsd-3-clause]."
+This project is licensed under the terms of the [BSD 3-Clause License][bsd-3-clause].
 
 
 [bsd-3-clause]: https://opensource.org/licenses/BSD-3-Clause
