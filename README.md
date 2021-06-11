@@ -74,8 +74,9 @@ The script identifies the relevant tables in the specification documents by sear
 
 See the [CHANGELOG.md][changelog] file.
 
+
 ## License
-[BSD 3-Clause License][bsd-3-clause] for the CSE and its native components and modules. Please see the individual licenses of the used third-party components.
+This project is licensed under the terms of the [BSD 3-Clause License][bsd-3-clause]."
 
 
 [bsd-3-clause]: https://opensource.org/licenses/BSD-3-Clause
