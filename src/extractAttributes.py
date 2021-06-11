@@ -158,7 +158,6 @@ def processDocuments(documents:list[str], outFilename:str, csvOut:bool) -> Attri
 				progress.update(processTask, advance=1)
 				if (snt := findAttributeTable(table)) is None:
 					continue
-
 				headersLen = len(snt.headers)
 				for r in table.rows[1:]:
 					cells = r.cells
@@ -172,7 +171,7 @@ def processDocuments(documents:list[str], outFilename:str, csvOut:bool) -> Attri
 					
 					# Don't process empty shortnames
 					if not shortname:	
-						break
+						continue
 
 					# Create or update entry for shortname
 					if shortname in attributes:

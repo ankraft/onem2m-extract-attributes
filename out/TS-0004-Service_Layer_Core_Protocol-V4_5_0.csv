@@ -72,6 +72,7 @@ areaNwkId,awi
 areaNwkInfo,ani
 areaNwkInfoAnnc,ania
 areaNwkType,ant
+assignedTokenIdentifiers,ati
 associatedCrossResourceSub,acrs
 attached,att
 attribute,atr
@@ -85,6 +86,10 @@ authorizationInformation,auif
 authorizationInformationResourceIDs,airi
 authorizationPolicy,aupy
 authorizationPolicyResourceIDs,apri
+authorRelIndicator,auri
+authorSignIndicator,asi
+authorSignReqInfo,asri
+authorSigns,aus
 backgroundDataTransfer,bdt
 backOffParameters,bop
 backOffParametersSet,bops
@@ -133,9 +138,11 @@ contentFilterSyntax,cfs
 contentInfo,cnf
 contentInstance,cin
 contentInstanceAnnc,cina
+contentOffset,cnot
 contentRef,conr
 contentSerialization,csz
 contentSize,cs
+contentStatus,cnst
 contentString,cstr
 contentType,cty
 coordinates,crd
@@ -180,6 +187,7 @@ deletionRules,dr
 deletionRulesRelation,drr
 deletions,dels
 delivery,dlv
+deliveryAggregation,da
 deliveryMetaData,dmd
 dependency,depr
 dependencyAnnc,depra
@@ -187,6 +195,7 @@ descendantCSEs,dcse
 description,dc
 descriptor,dsp
 descriptorRepresentation,dcrp
+desiredIdentifierResultType,drt
 desiredTimeWindow,dtw
 deviceCapability,dvc
 deviceCapabilityAnnc,dvca
@@ -233,7 +242,7 @@ evalCriteria,evc
 evalMode,evm
 evalPriority,epy
 evenStart,evs
-eventCat,ec
+eventCategory,ec
 eventCatNo,ecn
 eventCatType,ect
 eventConfig,evcg
@@ -298,6 +307,8 @@ groupAnnc,grpa
 groupID,gpi
 groupLink,gli
 groupName,gn
+groupRequestIdentifier,gid
+groupRequestTargetMembers,grtm
 holder,hld
 holder,tkhd
 hostedAELinks,hael
@@ -339,6 +350,7 @@ listOfNeighbors,lnh
 localMulticastGroup,lmg
 localTokenID,lti
 localTokenIdAssignment,ltia
+localTokenIDs,ltids
 location,loc
 locationContainerID,loi
 locationContainerName,lon
@@ -472,6 +484,7 @@ ontologyRef,or
 ontologyRepository,ontr
 ontologyRepositoryAnnc,ontra
 operation,op
+operationExecutionTime,oet
 operationMonitor,om
 operationName,gion
 operationResult,ors
@@ -481,6 +494,7 @@ operationType,opt
 operator,optr
 optionalRandomBackoffTime,rbt
 order,od
+originatingTimestamp,ot
 originator,org
 originatorIP,oip
 originatorLocation,olo
@@ -532,6 +546,7 @@ referencedResourceID,rri
 registrationStatus,regs
 regularResourcesAsTarget,rrat
 relatedSemantics,rels
+releaseVersionIndicator,rvi
 releaseVersions,rvs
 remoteCSE,csr
 remoteCSEAnnc,csra
@@ -542,6 +557,7 @@ requestContext,rct
 requestContextNotification,rctn
 requestedResourceType,rrt
 requestedValue,rqv
+requestExpirationTimestamp,rqet
 requestID,rid
 requestIdentifier,rqi
 requestOrigin,ror
@@ -566,10 +582,15 @@ resourceType,ty
 resourceTypes,rtys
 responsePrimitives,rsps
 responsesReceived,rsr
+responseStatusCode,rsc
 responseTarget,rstt
 responseTimeWindow,rstw
+responseType,rt
 responseTypeValue,rtv
+resultContent,rcn
+resultExpirationTimestamp,rset
 resultGenType,rgt
+resultPersistence,rp
 resultRepresentation,rsrp
 resultRepresentationFormat,rsrpf
 retrieveLastKnownLocation,rlkl
@@ -601,6 +622,7 @@ semanticMashupJobProfileAnnc,smjpa
 semanticMashupResult,smr
 semanticMashupResultAnnc,smra
 semanticOpExec,soe
+semanticQueryIndicator,sqi
 semanticRuleRepository,srr
 semanticRuleRepositoryAnnc,srra
 semanticsFilter,smf
@@ -695,6 +717,8 @@ tokenIDs,tids
 tokenLink,rltl
 tokenName,tknm
 tokenObject,tkob
+tokenRequestIndicator,tqi
+tokenRequestInformation,tqf
 tokens,tkns
 tracingInfo,tcin
 tracingOption,tcop
@@ -745,6 +769,7 @@ username,unm
 UUID,uuid
 validationEnable,vlde
 value,val
+vendorInformation,vsi
 verificationRequest,vrq
 version,vr
 volumePerNode,vpn
