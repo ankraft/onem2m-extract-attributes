@@ -4,7 +4,11 @@ Extract attributes, short and long names, categories, and more from the oneM2M s
 
 This script takes the oneM2M specification documents and searches for the short name definition tables. 
 It then generates a JSON structure that contains the attributes, short names, categories and other information.
-It optionally can also generate CSV (Comma Separated Values) files for easy mappings and can a report on duplicate attribute definitions.
+It optionally can also generate CSV (Comma Separated Values) files for easy mappings, and can a report on duplicate attribute definitions.
+The generated output can be used, for example, to support API documentation or to automatically generate attribute mappings in applications.
+
+
+<img src="images/flow.png" style="height:200px;"/>
 
 ## Installation
 
