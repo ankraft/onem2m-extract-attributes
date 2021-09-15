@@ -1,5 +1,7 @@
+Attribute,Short Name
 adminFQDN,adfq
 appID,apid
+authenticationProfile,autp
 certFingerprint,cfp
 childResource,ch
 completeTime,cpt
@@ -7,6 +9,8 @@ containerPath,cntp
 creationTime,ct
 CSE-ID,csi
 CSEBase,cb
+dataCollection,datc
+dataCollectionAnnc,datca
 description,dc
 expirationTime,et
 externalID,eid
@@ -14,12 +18,15 @@ fqdn,fq
 httpPort,hpt
 labels,lbl
 lastModifiedTime,lt
+MAFClientRegCfg,macrc
 MAFKeyRegDuration,mkrd
 MAFKeyRegLabels,mkrl
 measurementSchedule,mesc
+MEFClientRegCfg,mecrc
 mgmtDefinition,mgd
 mgmtLink,cmlk
 myCertFileContent,mcfc
+myCertFileCred,nycfc
 myCertFileFormat,mcff
 mycertFingerprint,mcfp
 name,nm
@@ -29,6 +36,8 @@ originatorID,oid
 parentID,pi
 pointOfAccess,poa
 rawPubKeyID,rpki
+registration,reg
+registrationAnnc,rega
 reportingSchedule,rpsc
 resourceID,ri
 resourceName,rn
@@ -39,6 +48,7 @@ symmKeyID,aski
 symmKeyValue,skv
 TLSCiphersuites,tlcs
 Trigger-Recipient-ID,tri
+trustAnchorCred,tac
 type,typ
 URI,uri
 value,val

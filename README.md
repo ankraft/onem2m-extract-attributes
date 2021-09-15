@@ -10,6 +10,14 @@ The generated output can be used, for example, to support API documentation or t
 
 <img src="images/flow.png" style="height:200px;"/>
 
+### Supported oneM2M Documents
+The script can extract the attributes and short names from the following oneM2M specifications:
+
+- TS-0004 - Service Layer Core Protocol
+- TS-0022 - Field Device Configuration
+- TS-0023 - SDT based Information Model and Mapping for Vertical Industries
+- TS-0032 - MAF and MEF Interface Specification
+
 ## Installation
 
 - The script requires [Python 3.8][python] or better to run.
@@ -30,15 +38,15 @@ The script accepts documents in **docx** format. If necessary existing documents
 
 The following listing provides an overview and some explanations for 
 ```text
-usage: extractAttributes.py [-h] [--outfile OUTFILENAME] [--csv] [--list | --list-duplicates] document [document ...]
+usage: extractAttributes.py [-h] [--outdir <output directory>] [--csv] [--list | --list-duplicates] document [document ...]
 
 positional arguments:
   document              documents to parse
 
 optional arguments:
   -h, --help            show this help message and exit
-  --outfile OUTFILENAME, -o OUTFILENAME
-                        specify output filename (default: attributes.json)
+  --outdir <output directory>, -o <output directory>
+                        specify output directory (default: out)
   --csv, -c             additionally generate shortname csv files (default: False)
   --list, -l            list all found attributes (default: False)
   --list-duplicates, -ld
@@ -47,17 +55,17 @@ optional arguments:
 
 ### Examples
 
-With the following command the script reads the document ```TS-0022-Field_Device_Configuration-V4_2_0.docx``` as input and generates the file ```attributes.json``` (the default) with the attribute definitions in the same directory.
+With the following command the script reads the document ```TS-0022-Field_Device_Configuration-V4_2_0.docx``` as input and generates the file ```attributes.json``` (the default) with the attribute definitions in the default output directory *out*.
 
 > ```python3 src/extractAttributes.py TS-0022-Field_Device_Configuration-V4_2_0.docx```
 
-The following command can be used to read and process all ```.docx``` documents in the same directory, and then generate the file ```oneM2M-attributes.json``` in the sub-directory *out*.
+The following command can be used to read and process all ```.docx``` documents in the same directory, and then generate the file ```attributes.json``` in the sub-directory *out*.
 
-> ```python3 src/extractAttributes.py *.docx -o out/oneM2M-attributes.json```
+> ```python3 src/extractAttributes.py *.docx -o out```
 
 The following command is similar to the previous example, but in addition also generates *CVS* files, one for each input document. These CSV files will have the same filenames as their respective input documents, but the extension ".csv" and are stored in the same location as other output documents.
 
-> ```python3 src/extractAttributes.py *.docx --csv -o out/oneM2M-attributes.json```
+> ```python3 src/extractAttributes.py *.docx --csv -o out```
 
 With the next command one can, in addition to the attribute's JSON file, list the result on the screen. Duplicate definitions are marked in red.
 
@@ -67,6 +75,9 @@ This output could be to much when one only wants to check for duplicates. Theref
 
 > ```python3 src/extractAttributes.py *.docx --list-duplicates```
 
+The following command is similar to the previous command, except that in addition it generates a CSV file *duplicates.csv* in the output directory.
+
+> ```python3 src/extractAttributes.py *.docx --list-duplicates --csv```
 <br/>
 
 ## Adapting the script for new and updated specification documents
