@@ -71,11 +71,12 @@ With the next command one can, in addition to the attribute's JSON file, list th
 
 > ```python3 src/extractAttributes.py *.docx --list```
 
-This output could be to much when one only wants to check for duplicates. Therefore, the following command can be used to list only the duplicate definitions on the screen.
+This output could be too much when one only wants to check for duplicates. Therefore, the following command can be used to list only duplicate definitions on the screen.
+This will list the attributes that have been defined multiple times as well as, in a separate table, the attributes for which multiple short names have been defined.
 
 > ```python3 src/extractAttributes.py *.docx --list-duplicates```
 
-The following command is similar to the previous command, except that in addition it generates a CSV file *duplicates.csv* in the output directory.
+The following command is similar to the previous command, except that in addition it generates the CSV files *duplicates.csv* and *duplicates_shortnames.csv* in the output directory.
 
 > ```python3 src/extractAttributes.py *.docx --list-duplicates --csv```
 <br/>

@@ -11,7 +11,7 @@ from __future__ import annotations
 import argparse, json, csv, os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Set, Union
+from typing import Dict, Set, Union, List, Tuple
 from docx import Document
 from docx.table import Table
 import docx.opc.exceptions
@@ -54,7 +54,8 @@ class Attribute:
 					'documents'	:	sorted([ v for v in self.documents ])
 				}
 
-Attributes = Dict[str, Attribute]
+Attributes 		= Dict[str, Attribute]
+AttributesSN	= Dict[str, List[str]]
 
 #	Rich console for pretty printing
 console = Console()
@@ -116,12 +117,12 @@ def findAttributeTable(table:Table, filename:str) -> Union[AttributeTable, None]
 	return None
 
 
-def processDocuments(documents:list[str], outDirectory:str, csvOut:bool) -> Attributes|None:
+def processDocuments(documents:list[str], outDirectory:str, csvOut:bool) -> Tuple[Attributes, AttributesSN]:
 
-	docs 							= {}
-	ptasks 							= {}
-	snCount							= 0
-	attributes:dict[str, Attribute]	= {}
+	docs 						= {}
+	ptasks 						= {}
+	attributes:Attributes		= {}		# Mapping short name -> Attribute definition
+	attributesSN:AttributesSN	= {}		# Mapping attribute name -> List of short names
 
 	with Progress(	TextColumn('[progress.description]{task.description}'),
 					BarColumn(),
@@ -144,21 +145,21 @@ def processDocuments(documents:list[str], outDirectory:str, csvOut:bool) -> Attr
 		for d in documents:
 			if not (dp := Path(d)).exists():
 				stopProgress(f'[red]Input document "{d}" does not esist')
-				return None
+				return None, None
 			if not dp.is_file():
 				stopProgress(f'[red]Input document "{d}" is not a file')
-				return None
+				return None, None
 			try:
 				docs[d] = Document(d)
 				ptasks[d] = progress.add_task(f'Processing {d} ...', total=1000)
 				progress.update(readTask, advance=1)
 			except docx.opc.exceptions.PackageNotFoundError as e:
 				stopProgress(f'[red]Input document "{d}" is not a .docx file')
-				return None
+				return None, None
 			except Exception as e:
 				stopProgress(f'[red]Error reading file "{d}"')
 				console.print_exception()
-				return None
+				return None, None
 		
 		# Add additional task
 		checkTask	= progress.add_task('Checking results ...', total=2)
@@ -185,7 +186,7 @@ def processDocuments(documents:list[str], outDirectory:str, csvOut:bool) -> Attr
 
 					# Extract names and do a bit of transformations
 					attributeName	= unidecode(cells[snt.attribute].text).strip()
-					shortname 		= unidecode(cells[snt.shortname].text.replace('*', '').lower())
+					shortname 		= unidecode(cells[snt.shortname].text.replace('*', '').strip().lower())
 					occursIn 		= map(str.strip, unidecode(cells[snt.occursIn].text).split(',')) if snt.occursIn > -1 else ['n/a']	# Split and strip 'occurs in' entries
 					
 					# Don't process empty shortnames
@@ -210,7 +211,14 @@ def processDocuments(documents:list[str], outDirectory:str, csvOut:bool) -> Attr
 										)
 					
 					attributes[shortname] = entry
-					snCount += 1
+
+					# Add the entry to the mapping list between attributes and short names. This is a list!
+					if (al := attributesSN.get(entry.attribute)):
+						# only add the entry to the mapping attributes -> entry if the shortname is different
+						if len([ sn for sn in al if sn == entry.shortname ]) == 0:
+							al.append(entry.shortname)
+					else:
+						attributesSN[entry.attribute] = [ entry.shortname ]
 				continue
 
 		#
@@ -218,11 +226,14 @@ def processDocuments(documents:list[str], outDirectory:str, csvOut:bool) -> Attr
 		#
 		progress.update(checkTask, advance=1)
 
-		# count duplicates
+		# count duplicates and duplicate attribute -> shortnames
 		countDuplicates = 0
 		for shortname, attribute in attributes.items():
 			countDuplicates += 1 if attribute.occurences > 1 else 0
 		progress.update(checkTask, advance=1)
+		countDuplicatesSN = 0
+		for sns in attributesSN.values():
+			countDuplicatesSN += 1 if len(sns) > 1 else 0
 
 		#
 		#	generate outputs
@@ -234,6 +245,7 @@ def processDocuments(documents:list[str], outDirectory:str, csvOut:bool) -> Attr
 			json.dump([ v.asDict() for v in attributes.values()], jsonFile, indent=4)
 
 		# Write output to CSV files
+		# TODO move to extra function
 		if csvOut:
 			for docName, doc in docs.items():			# Individually for each input file
 				progress.update(writeTask, advance=1)
@@ -253,22 +265,25 @@ def processDocuments(documents:list[str], outDirectory:str, csvOut:bool) -> Attr
 		#
 
 		progress.stop()
-		console.print(f'Processed short names:      {snCount}')
+		console.print(f'Processed short names:               {len(attributes)}')
 		if countDuplicates > 0:
-			console.print(f'Duplicate definitions:      {countDuplicates}')
+			console.print(f'Duplicate definitions:               {countDuplicates}')
+		if countDuplicatesSN > 0:
+			console.print(f'Duplicate definitions (short names): {countDuplicatesSN}')
 
-	return attributes
+
+	return attributes, attributesSN
 
 
-def printAttributeTables(attributes:Attributes, duplicatesOnly:bool=True) -> None:
+def printAttributeTables(attributes:Attributes, attributesSN:AttributesSN, duplicatesOnly:bool=True) -> None:
 	"""	Print the found attributes to the console. Optionally print only duplicate entries.
 	"""
-	table = Table(show_lines=True, border_style='grey27')
+	table = Table(title	='[bold italic]Duplicate Attributes', show_lines=True, border_style='grey27')
 	table.add_column('attribute', no_wrap=True)
 	table.add_column('shortname', no_wrap=True, min_width=6)
 	table.add_column('category', no_wrap=False)
 	table.add_column('document(s)', no_wrap=False)
-	for sn in sorted((attributes.keys())):
+	for sn in sorted(attributes.keys()):
 		attribute = attributes[sn]
 		if attribute.occurences > 1:
 			table.add_row(attribute.attribute, sn, ', '.join(attribute.categories), f'[red]{", ".join(attribute.documents)}')
@@ -276,20 +291,55 @@ def printAttributeTables(attributes:Attributes, duplicatesOnly:bool=True) -> Non
 			table.add_row(attribute.attribute, sn, ', '.join(attribute.categories), ', '.join(attribute.documents))
 	console.print(table)
 
+	if duplicatesOnly:
+		tableSN = Table(title='[bold italic]Duplicate Short Names', border_style='grey27')
+		tableSN.add_column('attribute', no_wrap=True)
+		tableSN.add_column('shortname', no_wrap=True, min_width=6)
+		tableSN.add_column('category', no_wrap=False)
+		tableSN.add_column('document(s)', no_wrap=False)
+		for an in sorted(attributesSN.keys()):
+			sns = attributesSN[an]
+			if (l := len(sns)) > 1:
+				for i,sn in enumerate(sns):
+					attribute = attributes[sn]
+					if i == 0:
+						tableSN.add_row(attribute.attribute, sn, ', '.join(attribute.categories), f'[red]{", ".join(attribute.documents)}', end_section= i == l-1)
+					elif i > 0:
+						tableSN.add_row('', sn, ', '.join(attribute.categories), f'[red]{", ".join(attribute.documents)}', end_section= i == l-1)
+		console.print(tableSN)
 
-def printAttributeCsv(attributes:Attributes, duplicatesOnly:bool=True, outDirectory:str=None) -> None:
-	"""	Print the found attributes to a CSV file. Optionally print only duplicate entries.
+
+def printAttributeCsv(attributes:Attributes, outDirectory:str=None) -> None:
+	"""	Print the found attributes to a CSV file. 
 	"""
-	# Write attributes also to a csv file
-	with open(f'{outDirectory}{os.sep}{"attributes" if not duplicatesOnly else "duplicates"}.csv', 'w') as csvFile:
+	with open(f'{outDirectory}{os.sep}attributes.csv', 'w') as csvFile:
+		writer = csv.writer(csvFile)
+		writer.writerow(['Attribute', 'Short Name', 'Categories', 'Documents'])
+		for sn in sorted((attributes.keys())):
+			attribute = attributes[sn]
+			writer.writerow([attribute.attribute, sn, ','.join(attribute.categories), ','.join(attribute.documents)])
+
+
+def printDuplicateCsv(attributes:Attributes, attributesSN:AttributesSN, outDirectory:str=None) -> None:
+	"""	Print two CSV files: the found duplicate attributes and duplicate shortnames for the same attribute.
+	"""
+	with open(f'{outDirectory}{os.sep}duplicates.csv', 'w') as csvFile:
 		writer = csv.writer(csvFile)
 		writer.writerow(['Attribute', 'Short Name', 'Categories', 'Documents'])
 		for sn in sorted((attributes.keys())):
 			attribute = attributes[sn]
 			if attribute.occurences > 1:
 				writer.writerow([attribute.attribute, sn, ','.join(attribute.categories), ','.join(attribute.documents)])
-			elif not duplicatesOnly:
-				writer.writerow([attribute.attribute, sn, ','.join(attribute.categories), ','.join(attribute.documents)])
+
+	with open(f'{outDirectory}{os.sep}duplicate_shortnames.csv', 'w') as csvFile:
+		writer = csv.writer(csvFile)
+		for an in sorted((attributesSN.keys())):
+			sns = attributesSN[an]
+			if len(sns) > 1:
+				for sn in sns:
+					attribute = attributes[sn]
+					writer.writerow([attribute.attribute, sn, ','.join(attribute.categories), ','.join(attribute.documents)])
+
 
 
 
@@ -309,9 +359,13 @@ if __name__ == '__main__':
 
 	# Process documents and print output
 	os.makedirs(args.outDirectory, exist_ok=True)
-	if (attributes := processDocuments(sorted(args.document), args.outDirectory, args.csvOut)) is None:
+	
+	attributes, attributesSN = processDocuments(sorted(args.document), args.outDirectory, args.csvOut)
+	if not attributes:
 		exit(1)
 	if args.list or args.listDuplicates:
-		printAttributeTables(attributes, args.listDuplicates)
+		printAttributeTables(attributes, attributesSN, args.listDuplicates)
 		if args.csvOut:
-			printAttributeCsv(attributes, args.listDuplicates, args.outDirectory)
+			printAttributeCsv(attributes, args.outDirectory)
+			if args.listDuplicates:
+				printDuplicateCsv(attributes, attributesSN, args.outDirectory)

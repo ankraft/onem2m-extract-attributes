@@ -108,7 +108,7 @@ capabilityActionStatus,cas
 capabilityName,can
 certificates,escert
 childAttribute,catr
-childLabels,clbl 
+childLabels,clbl
 childResource,ch
 childResourceType,chty
 circRegion,accr
@@ -543,7 +543,6 @@ reasoningRules,rrul
 reasoningRulesAnnc,rrula
 reasoningType,rtyp
 reboot,rbo
-reboot,rbo 
 rebootAnnc,rboa
 referencedResourceID,rri
 registrationStatus,regs
@@ -693,7 +692,7 @@ swVersion,swv
 systemTime,syst
 target,tg
 targetedResourceID,trid
-targetedResourceType,tirt 
+targetedResourceType,tirt
 targetedResourceType,trt
 targetFile,tgf
 targetNetwork,ttn
@@ -746,10 +745,8 @@ Trigger-Recipient-ID,tri
 triggerEnable,tren
 triggerInfoAddress,tia
 triggerInfoAE-ID,tiae
-triggerInfoOperation,tio 
 triggerInfoOperation,tio
 triggerInfoPoA,tipa
-triggerInfoResourceType,tirt
 triggerInfoSerializationTypes,tist
 triggerPayload (root element),tgp
 triggerPurpose,tpe

@@ -3358,11 +3358,13 @@
         "attribute": "reboot",
         "occursIn": [
             "execReqArgsListType",
+            "n/a",
             "reboot"
         ],
         "categories": [
             "Complex Data Types",
-            "Resource Attributes"
+            "Resource Attributes",
+            "Resource Types"
         ],
         "documents": [
             "TS-0004-Service_Layer_Core_Protocol-V4_6_0.docx"
@@ -5455,26 +5457,30 @@
         ]
     },
     {
-        "shortname": "tio ",
+        "shortname": "tio",
         "attribute": "triggerInfoOperation",
         "occursIn": [
+            "n/a",
             "triggerRequest"
         ],
         "categories": [
-            "Resource Attributes"
+            "Resource Attributes",
+            "Trigger Payload Fields"
         ],
         "documents": [
             "TS-0004-Service_Layer_Core_Protocol-V4_6_0.docx"
         ]
     },
     {
-        "shortname": "tirt ",
+        "shortname": "tirt",
         "attribute": "targetedResourceType",
         "occursIn": [
+            "n/a",
             "triggerRequest"
         ],
         "categories": [
-            "Resource Attributes"
+            "Resource Attributes",
+            "Trigger Payload Fields"
         ],
         "documents": [
             "TS-0004-Service_Layer_Core_Protocol-V4_6_0.docx"
@@ -6898,19 +6904,6 @@
     {
         "shortname": "dvca",
         "attribute": "deviceCapabilityAnnc",
-        "occursIn": [
-            "n/a"
-        ],
-        "categories": [
-            "Resource Types"
-        ],
-        "documents": [
-            "TS-0004-Service_Layer_Core_Protocol-V4_6_0.docx"
-        ]
-    },
-    {
-        "shortname": "rbo ",
-        "attribute": "reboot",
         "occursIn": [
             "n/a"
         ],
@@ -10081,7 +10074,7 @@
         ]
     },
     {
-        "shortname": "clbl ",
+        "shortname": "clbl",
         "attribute": "childLabels",
         "occursIn": [
             "filterCriteria"
@@ -10460,32 +10453,6 @@
     {
         "shortname": "tgp",
         "attribute": "triggerPayload (root element)",
-        "occursIn": [
-            "n/a"
-        ],
-        "categories": [
-            "Trigger Payload Fields"
-        ],
-        "documents": [
-            "TS-0004-Service_Layer_Core_Protocol-V4_6_0.docx"
-        ]
-    },
-    {
-        "shortname": "tio",
-        "attribute": "triggerInfoOperation",
-        "occursIn": [
-            "n/a"
-        ],
-        "categories": [
-            "Trigger Payload Fields"
-        ],
-        "documents": [
-            "TS-0004-Service_Layer_Core_Protocol-V4_6_0.docx"
-        ]
-    },
-    {
-        "shortname": "tirt",
-        "attribute": "triggerInfoResourceType",
         "occursIn": [
             "n/a"
         ],
