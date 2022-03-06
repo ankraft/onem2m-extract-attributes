@@ -37,7 +37,8 @@ class AttributeTable:
 class Attribute:
 	"""	Datastruture for an attribute, including shortname, longname, category etc.
 	"""
-	shortname: str
+	shortname: str			# Lower case variant of the short name
+	shortnameOrig: str
 	attribute: str
 	occurences:int
 	occursIn:Set
@@ -47,7 +48,7 @@ class Attribute:
 	def asDict(self) -> dict:
 		"""	Return this dataclass as a dictionary.
 		"""
-		return 	{	'shortname'	:	self.shortname,
+		return 	{	'shortname'	:	self.shortnameOrig,
 					'attribute'	:	self.attribute,
 					'occursIn'	:	sorted([ v for v in self.occursIn ]),
 					'categories':	sorted([ v for v in self.categories ]),
@@ -82,7 +83,7 @@ attributeTables:list[AttributeTable] = [
 
 	# TS-0023
 	AttributeTable(headers=['Resource Type Name', 'Short Name'], 							attribute=0, shortname=1, occursIn=-1, filename='ts-0023', category='Specialization type short names'),
-	AttributeTable(headers=['Attribute Name', 'Occurs in', 'Short Name'], 					attribute=0, shortname=2, occursIn=1,  filename='ts-0004', category='Resource attribute short names'),
+	AttributeTable(headers=['Attribute Name', 'Occurs in', 'Short Name'], 					attribute=0, shortname=2, occursIn=1,  filename='ts-0023', category='Resource attribute short names'),
 	AttributeTable(headers=['Argument Name', 'Occurs in', 'Short Name'],					attribute=0, shortname=2, occursIn=1,  filename='ts-0023', category='Resource attribute short names'),
 
 	# TS-0032
@@ -151,7 +152,7 @@ def processDocuments(documents:list[str], outDirectory:str, csvOut:bool) -> Tupl
 				return None, None
 			try:
 				docs[d] = Document(d)
-				ptasks[d] = progress.add_task(f'Processing {d} ...', total=1000)
+				ptasks[d] = progress.add_task(f'Processing {d} ...', total = 1000)
 				progress.update(readTask, advance=1)
 			except docx.opc.exceptions.PackageNotFoundError as e:
 				stopProgress(f'[red]Input document "{d}" is not a .docx file')
@@ -163,7 +164,7 @@ def processDocuments(documents:list[str], outDirectory:str, csvOut:bool) -> Tupl
 		
 		# Add additional task
 		checkTask	= progress.add_task('Checking results ...', total=2)
-		writeTask	= progress.add_task('Writing files ...', total=2+len(documents) if csvOut else 2)
+		writeTask	= progress.add_task('Writing files ...', total = 2+len(documents) if csvOut else 2)
 
 		#
 		#	Process documents
@@ -186,7 +187,8 @@ def processDocuments(documents:list[str], outDirectory:str, csvOut:bool) -> Tupl
 
 					# Extract names and do a bit of transformations
 					attributeName	= unidecode(cells[snt.attribute].text).strip()
-					shortname 		= unidecode(cells[snt.shortname].text.replace('*', '').strip().lower())
+					shortnameOrig	= unidecode(cells[snt.shortname].text.replace('*', '').strip())
+					shortname 		= shortnameOrig.lower()
 					occursIn 		= map(str.strip, unidecode(cells[snt.occursIn].text).split(',')) if snt.occursIn > -1 else ['n/a']	# Split and strip 'occurs in' entries
 					
 					# Don't process empty shortnames
@@ -202,12 +204,13 @@ def processDocuments(documents:list[str], outDirectory:str, csvOut:bool) -> Tupl
 						entry.documents.add(docName)
 						entry.occurences += 1
 					else:
-						entry = Attribute(	shortname=shortname,
-											attribute=attributeName,
-											occurences=1,
-											occursIn=set([ v for v in occursIn ]),
-											categories=set([ snt.category ]),
-											documents=set([ docName ])
+						entry = Attribute(	shortname = shortname,
+											shortnameOrig = shortnameOrig,
+											attribute = attributeName,
+											occurences = 1,
+											occursIn = set([ v for v in occursIn ]),
+											categories = set([ snt.category ]),
+											documents = set([ docName ])
 										)
 					
 					attributes[shortname] = entry
@@ -224,7 +227,7 @@ def processDocuments(documents:list[str], outDirectory:str, csvOut:bool) -> Tupl
 		#
 		#	Further tests
 		#
-		progress.update(checkTask, advance=1)
+		progress.update(checkTask, advance = 1)
 
 		# count duplicates and duplicate attribute -> shortnames
 		countDuplicates = 0
@@ -255,7 +258,7 @@ def processDocuments(documents:list[str], outDirectory:str, csvOut:bool) -> Tupl
 					writer.writerow(['Attribute', 'Short Name'])
 					writer.writerows(	
 						sorted(
-							[ [attr.attribute, attr.shortname] for attr in attributes.values() if docName in attr.documents ],
+							[ [attr.attribute, attr.shortnameOrig] for attr in attributes.values() if docName in attr.documents ],
 							key=lambda x: x[0].lower() ))	# type: ignore [index]
 
 		progress.update(writeTask, advance=1)
@@ -275,41 +278,41 @@ def processDocuments(documents:list[str], outDirectory:str, csvOut:bool) -> Tupl
 	return attributes, attributesSN
 
 
-def printAttributeTables(attributes:Attributes, attributesSN:AttributesSN, duplicatesOnly:bool=True) -> None:
+def printAttributeTables(attributes:Attributes, attributesSN:AttributesSN, duplicatesOnly:bool = True) -> None:
 	"""	Print the found attributes to the console. Optionally print only duplicate entries.
 	"""
-	table = Table(title	='[bold italic]Duplicate Attributes', show_lines=True, border_style='grey27')
-	table.add_column('attribute', no_wrap=True)
-	table.add_column('shortname', no_wrap=True, min_width=6)
-	table.add_column('category', no_wrap=False)
-	table.add_column('document(s)', no_wrap=False)
+	table = Table(title	= '[bold italic]Duplicate Attributes', show_lines = True, border_style = 'grey27')
+	table.add_column('attribute', no_wrap = True)
+	table.add_column('shortname', no_wrap = True, min_width = 6)
+	table.add_column('category', no_wrap = False)
+	table.add_column('document(s)', no_wrap = False)
 	for sn in sorted(attributes.keys()):
 		attribute = attributes[sn]
 		if attribute.occurences > 1:
-			table.add_row(attribute.attribute, sn, ', '.join(attribute.categories), f'[red]{", ".join(attribute.documents)}')
+			table.add_row(attribute.attribute, attribute.shortnameOrig, ', '.join(attribute.categories), f'[red]{", ".join(attribute.documents)}')
 		elif not duplicatesOnly:
-			table.add_row(attribute.attribute, sn, ', '.join(attribute.categories), ', '.join(attribute.documents))
+			table.add_row(attribute.attribute, attribute.shortnameOrig, ', '.join(attribute.categories), ', '.join(attribute.documents))
 	console.print(table)
 
 	if duplicatesOnly:
-		tableSN = Table(title='[bold italic]Duplicate Short Names', border_style='grey27')
-		tableSN.add_column('attribute', no_wrap=True)
-		tableSN.add_column('shortname', no_wrap=True, min_width=6)
-		tableSN.add_column('category', no_wrap=False)
-		tableSN.add_column('document(s)', no_wrap=False)
+		tableSN = Table(title = '[bold italic]Duplicate Short Names', border_style = 'grey27')
+		tableSN.add_column('attribute', no_wrap = True)
+		tableSN.add_column('shortname', no_wrap = True, min_width = 6)
+		tableSN.add_column('category', no_wrap = False)
+		tableSN.add_column('document(s)', no_wrap = False)
 		for an in sorted(attributesSN.keys()):
 			sns = attributesSN[an]
 			if (l := len(sns)) > 1:
 				for i,sn in enumerate(sns):
 					attribute = attributes[sn]
 					if i == 0:
-						tableSN.add_row(attribute.attribute, sn, ', '.join(attribute.categories), f'[red]{", ".join(attribute.documents)}', end_section= i == l-1)
+						tableSN.add_row(attribute.attribute, attribute.shortnameOrig, ', '.join(attribute.categories), f'[red]{", ".join(attribute.documents)}', end_section = i == l-1)
 					elif i > 0:
-						tableSN.add_row('', sn, ', '.join(attribute.categories), f'[red]{", ".join(attribute.documents)}', end_section= i == l-1)
+						tableSN.add_row('', attribute.shortnameOrig, ', '.join(attribute.categories), f'[red]{", ".join(attribute.documents)}', end_section = i == l-1)
 		console.print(tableSN)
 
 
-def printAttributeCsv(attributes:Attributes, outDirectory:str=None) -> None:
+def printAttributeCsv(attributes:Attributes, outDirectory:str = None) -> None:
 	"""	Print the found attributes to a CSV file. 
 	"""
 	with open(f'{outDirectory}{os.sep}attributes.csv', 'w') as csvFile:
@@ -317,10 +320,10 @@ def printAttributeCsv(attributes:Attributes, outDirectory:str=None) -> None:
 		writer.writerow(['Attribute', 'Short Name', 'Categories', 'Documents'])
 		for sn in sorted((attributes.keys())):
 			attribute = attributes[sn]
-			writer.writerow([attribute.attribute, sn, ','.join(attribute.categories), ','.join(attribute.documents)])
+			writer.writerow([attribute.attribute, attribute.shortnameOrig, ','.join(attribute.categories), ','.join(attribute.documents)])
 
 
-def printDuplicateCsv(attributes:Attributes, attributesSN:AttributesSN, outDirectory:str=None) -> None:
+def printDuplicateCsv(attributes:Attributes, attributesSN:AttributesSN, outDirectory:str = None) -> None:
 	"""	Print two CSV files: the found duplicate attributes and duplicate shortnames for the same attribute.
 	"""
 	with open(f'{outDirectory}{os.sep}duplicates.csv', 'w') as csvFile:
@@ -329,7 +332,7 @@ def printDuplicateCsv(attributes:Attributes, attributesSN:AttributesSN, outDirec
 		for sn in sorted((attributes.keys())):
 			attribute = attributes[sn]
 			if attribute.occurences > 1:
-				writer.writerow([attribute.attribute, sn, ','.join(attribute.categories), ','.join(attribute.documents)])
+				writer.writerow([attribute.attribute, attribute.shortnameOrig, ','.join(attribute.categories), ','.join(attribute.documents)])
 
 	with open(f'{outDirectory}{os.sep}duplicate_shortnames.csv', 'w') as csvFile:
 		writer = csv.writer(csvFile)
@@ -338,27 +341,25 @@ def printDuplicateCsv(attributes:Attributes, attributesSN:AttributesSN, outDirec
 			if len(sns) > 1:
 				for sn in sns:
 					attribute = attributes[sn]
-					writer.writerow([attribute.attribute, sn, ','.join(attribute.categories), ','.join(attribute.documents)])
-
-
+					writer.writerow([attribute.attribute, attribute.shortnameOrig, ','.join(attribute.categories), ','.join(attribute.documents)])
 
 
 if __name__ == '__main__':
 
 	# Parse command line arguments
 	parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-	parser.add_argument('--outdir', '-o', action='store', dest='outDirectory', default='out', metavar='<output directory>',  help='specify output directory')
-	parser.add_argument('--csv', '-c', action='store_true', dest='csvOut', default=False, help='additionally generate shortname csv files')
+	parser.add_argument('--outdir', '-o', action='store', dest='outDirectory', default = 'out', metavar = '<output directory>',  help = 'specify output directory')
+	parser.add_argument('--csv', '-c', action = 'store_true', dest = 'csvOut', default = False, help = 'additionally generate shortname csv files')
 	
 	listArgs = parser.add_mutually_exclusive_group()
-	listArgs.add_argument('--list', '-l', action='store_true', dest='list', default=False, help='list all found attributes')
-	listArgs.add_argument('--list-duplicates', '-ld', action='store_true', dest='listDuplicates', default=False, help='list only duplicate attributes')
+	listArgs.add_argument('--list', '-l', action = 'store_true', dest = 'list', default = False, help = 'list all found attributes')
+	listArgs.add_argument('--list-duplicates', '-ld', action = 'store_true', dest = 'listDuplicates', default = False, help = 'list only duplicate attributes')
 
-	parser.add_argument('document', nargs='+', help='documents to parse')
+	parser.add_argument('document', nargs = '+', help = 'documents to parse')
 	args = parser.parse_args()
 
 	# Process documents and print output
-	os.makedirs(args.outDirectory, exist_ok=True)
+	os.makedirs(args.outDirectory, exist_ok = True)
 	
 	attributes, attributesSN = processDocuments(sorted(args.document), args.outDirectory, args.csvOut)
 	if not attributes:

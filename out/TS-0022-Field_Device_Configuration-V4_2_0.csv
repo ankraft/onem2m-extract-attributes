@@ -10,7 +10,7 @@ creationTime,ct
 CSE-ID,csi
 CSEBase,cb
 dataCollection,datc
-dataCollectionAnnc,datca
+dataCollectionAnnc,datcA
 description,dc
 expirationTime,et
 externalID,eid
@@ -37,7 +37,7 @@ parentID,pi
 pointOfAccess,poa
 rawPubKeyID,rpki
 registration,reg
-registrationAnnc,rega
+registrationAnnc,regA
 reportingSchedule,rpsc
 resourceID,ri
 resourceName,rn
