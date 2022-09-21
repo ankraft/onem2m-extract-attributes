@@ -9,7 +9,7 @@ setup(
     description='Extract attributes, short and long names, categories, and more from the oneM2M specification documents',
     packages=find_packages(),
 	install_requires=[
-		'docx',
+		'python-docx',
 		'rich',
 		'unidecode'
 	],
